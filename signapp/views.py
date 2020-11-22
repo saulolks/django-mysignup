@@ -15,6 +15,8 @@ from .utils.exceptions import (
     InvalidTokenError,
     ExpiredTokenError,
 )
+from django.db import IntegrityError
+from django.db import transaction
 
 # Create your views here.
 
@@ -53,10 +55,10 @@ def signup(request):
             phone_list.append(phone)
 
         token = Token(user=user)
-
-        user.save()
-        [phone.save() for phone in phone_list]
-        token.save()
+        with transaction.atomic():
+            user.save()
+            [phone.save() for phone in phone_list]
+            token.save()
 
         jwt = jwt_manager.get(user.id, token.hash)
 
@@ -67,6 +69,9 @@ def signup(request):
     except EmailAlreadyExistsError:
         print("[ERROR] Email already exists in database")
         return JsonResponse({"message": "E-mail already exists", "errorCode": 409})
+    except IntegrityError:
+        print("[ERROR] Phone is already registered")
+        return JsonResponse({"message": "Phone is already registered", "errorCode": 400})
     except Exception as ex:
         print("[ERROR] Unknown error:", ex)
         return JsonResponse({"message": "Server error", "errorCode": 400})
@@ -95,8 +100,9 @@ def signin(request):
         token = Token.objects.get(user=user)
         token.update_hash()
 
-        user.save()
-        token.save()
+        with transaction.atomic():
+            user.save()
+            token.save()
 
         jwt = jwt_manager.get(user.id, token.hash)
         return JsonResponse({"token": jwt, "statusCode": 200})

@@ -24,9 +24,9 @@ class User(models.Model):
 
 class Phone(models.Model):
     id = models.AutoField(primary_key=True)
-    number = models.IntegerField()
-    area_code = models.IntegerField()
-    country_code = models.CharField(max_length=5)
+    number = models.IntegerField(unique=False)
+    area_code = models.IntegerField(unique=False)
+    country_code = models.CharField(max_length=5, unique=False)
     user = models.ForeignKey("user", on_delete=models.CASCADE, related_name="phones")
 
     class Meta:

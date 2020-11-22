@@ -123,7 +123,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 
 # My settings
-TOKEN_EXPIRATION_SECONDS = 10800
+TOKEN_EXPIRATION_SECONDS = 180
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG") == "True"
 
