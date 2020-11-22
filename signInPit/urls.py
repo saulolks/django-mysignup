@@ -19,7 +19,7 @@ from signapp import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("signup", views.signup),
-    path("signin", views.signin),
-    path("me", views.me),
+    path("signup", views.signup, name="signup"),
+    path("signin", views.signin, name="signin"),
+    path("me", views.me, name="me"),
 ]

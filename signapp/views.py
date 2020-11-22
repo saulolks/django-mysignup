@@ -63,8 +63,8 @@ def signup(request):
         jwt = jwt_manager.get(user.id, token.hash)
 
         return JsonResponse({"token": jwt, "statusCode": 200})
-    except KeyError:
-        print("[ERROR] Missing fields")
+    except KeyError as ex:
+        print("[ERROR] Missing fields:", ex)
         return JsonResponse({"message": "Missing fields", "errorCode": 400})
     except EmailAlreadyExistsError:
         print("[ERROR] Email already exists in database")

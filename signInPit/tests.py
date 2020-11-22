@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 
+import json
 import random
 
 
@@ -20,7 +21,8 @@ class SignUpTest(TestCase):
         }
 
         response = self.client.post(reverse("signup"), payload)
-        self.assertEqual(response.status_code, 200)
+        code = json.loads(response.content)["errorCode"]
+        self.assertEqual(code, 200)
 
     def test_duplicated_email(self):
         email = (f"unittest{random.randint(1,1000000)}@test.com",)
@@ -47,7 +49,8 @@ class SignUpTest(TestCase):
             ],
         }
         response = self.client.post(reverse("signup"), payload)
-        self.assertEqual(response.status_code, 409)
+        code = json.loads(response.content)["errorCode"]
+        self.assertEqual(code, 409)
 
     def test_duplicated_phone(self):
         phone = (random.randint(1, 100000000),)
@@ -70,7 +73,8 @@ class SignUpTest(TestCase):
             "phones": [{"number": phone, "area_code": 81, "country_code": "+55"}],
         }
         response = self.client.post(reverse("signup"), payload)
-        self.assertEqual(response.status_code, 409)
+        code = json.loads(response.content)["errorCode"]
+        self.assertEqual(code, 409)
 
     def test_missing_fields(self):
         payload = {
@@ -83,7 +87,8 @@ class SignUpTest(TestCase):
         }
 
         response = self.client.post(reverse("signup"), payload)
-        self.assertEqual(response.status_code, 400)
+        code = json.loads(response.content)["errorCode"]
+        self.assertEqual(code, 400)
 
 
 class SignInTest(TestCase):
@@ -126,21 +131,24 @@ class SignInTest(TestCase):
 
         payload = {"email": email, "password": "not admin"}
         response = self.client.post(reverse("signin"), payload)
-        self.assertEqual(response.status_code, 401)
+        code = json.loads(response.content)["errorCode"]
+        self.assertEqual(code, 401)
 
     def test_missing_fields(self):
         email = (f"unittest{random.randint(1,1000000)}@test.com",)
 
         payload = {"email": email}
         response = self.client.post(reverse("signin"), payload)
-        self.assertEqual(response.status_code, 400)
+        code = json.loads(response.content)["errorCode"]
+        self.assertEqual(code, 400)
 
     def test_unregistered_email(self):
         email = (f"unittest{random.randint(1,1000000)}@test.com",)
 
         payload = {"email": email, "password": "admin"}
         response = self.client.post(reverse("signin"), payload)
-        self.assertEqual(response.status_code, 401)
+        code = json.loads(response.content)["errorCode"]
+        self.assertEqual(code, 401)
 
 
 class MeTest(TestCase):
@@ -162,7 +170,7 @@ class MeTest(TestCase):
         response = self.client.post(reverse("signup"), payload)
         self.assertEqual(response.status_code, 200)
 
-        token = response.data["token"]
+        token = json.loads(response.content)["token"]
         headers = {"Authorization": token}
 
         response = self.client.get(reverse("me"), headers=headers)
@@ -172,4 +180,5 @@ class MeTest(TestCase):
         headers = {"Authorization": "123"}
 
         response = self.client.get(reverse("me"), headers=headers)
-        self.assertEqual(response.status_code, 40111)
+        code = json.loads(response.content)["errorCode"]
+        self.assertEqual(code, 401)
