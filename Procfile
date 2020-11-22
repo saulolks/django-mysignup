@@ -1,1 +1,1 @@
-gunicorn signInPit.wsgi
+web: gunicorn signInPit.wsgi
