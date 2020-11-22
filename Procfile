@@ -1,1 +1,1 @@
-gunicorn django-mysignup.wsgi
+gunicorn signInPit.wsgi
