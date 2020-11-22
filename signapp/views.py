@@ -71,7 +71,7 @@ def signup(request):
         return JsonResponse({"message": "E-mail already exists", "errorCode": 409})
     except IntegrityError:
         print("[ERROR] Phone is already registered")
-        return JsonResponse({"message": "Phone is already registered", "errorCode": 400})
+        return JsonResponse({"message": "Phone is already registered", "errorCode": 409})
     except Exception as ex:
         print("[ERROR] Unknown error:", ex)
         return JsonResponse({"message": "Server error", "errorCode": 400})
