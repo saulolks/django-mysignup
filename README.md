@@ -15,8 +15,24 @@ O acesso as APIs são feitas pela seguinte URL: https://django-mysignup.herokuap
 
 - [POST] /signup
   - Dados deverão ser passados no body.
+  ```json
+  {
+      "firstName": "Otávio",
+      "lastName": "Lucas",
+      "email": "otavio112@gmail.com",
+      "password": "admin",
+      "phones": [
+      ]
+  }
+  ```
 - [POST] /signin
   - Dados deverão ser passados no body.
+  ```json
+  {
+      "email": "otavio112@gmail.com",
+      "password": "admin"
+  }
+  ```
 - [GET] /me
   - Dado deverá ser passado no header, no campo Authorization.
 
