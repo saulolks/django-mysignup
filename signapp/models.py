@@ -44,6 +44,7 @@ class Token(models.Model):
 
     def update_hash(self):
         self.hash = str(uuid.uuid4())
+        self.timestamp = timezone.now()
 
     def is_expired(self):
         timediff = timezone.now() - self.timestamp
