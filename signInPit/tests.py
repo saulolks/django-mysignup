@@ -1,11 +1,14 @@
 from django.test import TestCase, Client
-from django.url import reverse
+from django.urls import reverse
 
 import random
 
 
 class SignUpTest(TestCase):
-    def create_user_test(self):
+    def setUp(self):
+        self.client = Client()
+
+    def test_create_user(self):
         payload = {
             "firstName": "Unit",
             "lastName": "Test",
@@ -19,12 +22,12 @@ class SignUpTest(TestCase):
         response = self.client.post(reverse("signup"), payload)
         self.assertEqual(response.status_code, 200)
 
-    def duplicated_email_test(self):
-        email = f"unittest{random.randint(1,1000000)}@test.com",
+    def test_duplicated_email(self):
+        email = (f"unittest{random.randint(1,1000000)}@test.com",)
         payload = {
             "firstName": "Unit",
             "lastName": "Test",
-            "email": email
+            "email": email,
             "password": "admin",
             "phones": [
                 {"number": random.randint(1, 1000000000), "area_code": 81, "country_code": "+55"}
@@ -37,7 +40,7 @@ class SignUpTest(TestCase):
         payload = {
             "firstName": "Unit",
             "lastName": "Test",
-            "email": email
+            "email": email,
             "password": "admin",
             "phones": [
                 {"number": random.randint(1, 1000000000), "area_code": 81, "country_code": "+55"}
@@ -46,17 +49,14 @@ class SignUpTest(TestCase):
         response = self.client.post(reverse("signup"), payload)
         self.assertEqual(response.status_code, 409)
 
-
-    def duplicated_phone_test(self):
-        phone = random.randint(1,100000000),
+    def test_duplicated_phone(self):
+        phone = (random.randint(1, 100000000),)
         payload = {
             "firstName": "Unit",
             "lastName": "Test",
             "email": f"unittest{random.randint(1,1000000)}@test.com",
             "password": "admin",
-            "phones": [
-                {"number": phone, "area_code": 81, "country_code": "+55"}
-            ],
+            "phones": [{"number": phone, "area_code": 81, "country_code": "+55"}],
         }
 
         response = self.client.post(reverse("signup"), payload)
@@ -67,31 +67,109 @@ class SignUpTest(TestCase):
             "lastName": "Test",
             "email": f"unittest{random.randint(1,1000000)}@test.com",
             "password": "admin",
-            "phones": [
-                {"number": phone, "area_code": 81, "country_code": "+55"}
-            ],
+            "phones": [{"number": phone, "area_code": 81, "country_code": "+55"}],
         }
         response = self.client.post(reverse("signup"), payload)
         self.assertEqual(response.status_code, 409)
 
-    def missing_fields_test(self):
-        pass
+    def test_missing_fields(self):
+        payload = {
+            "firstName": "Unit",
+            "email": f"unittest{random.randint(1,1000000)}@test.com",
+            "password": "admin",
+            "phones": [
+                {"number": random.randint(1, 1000000000), "area_code": 81, "country_code": "+55"}
+            ],
+        }
+
+        response = self.client.post(reverse("signup"), payload)
+        self.assertEqual(response.status_code, 400)
 
 
 class SignInTest(TestCase):
-    def successful_login_test(self):
-        pass
+    def setUp(self):
+        self.client = Client()
 
-    def incorrect_password_test(self):
-        pass
+    def test_successful_login(self):
+        email = (f"unittest{random.randint(1,1000000)}@test.com",)
+        payload = {
+            "firstName": "Unit",
+            "lastName": "Test",
+            "email": f"unittest{random.randint(1,1000000)}@test.com",
+            "password": "admin",
+            "phones": [
+                {"number": random.randint(1, 1000000000), "area_code": 81, "country_code": "+55"}
+            ],
+        }
 
-    def missing_fields_test(self):
-        pass
+        response = self.client.post(reverse("signup"), payload)
+        self.assertEqual(response.status_code, 200)
+
+        payload = {"email": email, "password": "admin"}
+        response = self.client.post(reverse("signin"), payload)
+        self.assertEqual(response.status_code, 200)
+
+    def test_incorrect_password(self):
+        email = (f"unittest{random.randint(1,1000000)}@test.com",)
+        payload = {
+            "firstName": "Unit",
+            "lastName": "Test",
+            "email": f"unittest{random.randint(1,1000000)}@test.com",
+            "password": "admin",
+            "phones": [
+                {"number": random.randint(1, 1000000000), "area_code": 81, "country_code": "+55"}
+            ],
+        }
+
+        response = self.client.post(reverse("signup"), payload)
+        self.assertEqual(response.status_code, 200)
+
+        payload = {"email": email, "password": "not admin"}
+        response = self.client.post(reverse("signin"), payload)
+        self.assertEqual(response.status_code, 401)
+
+    def test_missing_fields(self):
+        email = (f"unittest{random.randint(1,1000000)}@test.com",)
+
+        payload = {"email": email}
+        response = self.client.post(reverse("signin"), payload)
+        self.assertEqual(response.status_code, 400)
+
+    def test_unregistered_email(self):
+        email = (f"unittest{random.randint(1,1000000)}@test.com",)
+
+        payload = {"email": email, "password": "admin"}
+        response = self.client.post(reverse("signin"), payload)
+        self.assertEqual(response.status_code, 401)
 
 
 class MeTest(TestCase):
-    def invalid_token_test(self):
-        pass
+    def setUp(self):
+        self.client = Client()
 
-    def anothers_token_test(self):
-        pass
+    def test_valid_token(self):
+        email = (f"unittest{random.randint(1,1000000)}@test.com",)
+        payload = {
+            "firstName": "Unit",
+            "lastName": "Test",
+            "email": f"unittest{random.randint(1,1000000)}@test.com",
+            "password": "admin",
+            "phones": [
+                {"number": random.randint(1, 1000000000), "area_code": 81, "country_code": "+55"}
+            ],
+        }
+
+        response = self.client.post(reverse("signup"), payload)
+        self.assertEqual(response.status_code, 200)
+
+        token = response.data["token"]
+        headers = {"Authorization": token}
+
+        response = self.client.get(reverse("me"), headers=headers)
+        self.assertEqual(response.status_code, 200)
+
+    def test_invalid_token(self):
+        headers = {"Authorization": "123"}
+
+        response = self.client.get(reverse("me"), headers=headers)
+        self.assertEqual(response.status_code, 40111)

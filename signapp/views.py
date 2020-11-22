@@ -143,13 +143,13 @@ def me(request):
         return JsonResponse({"data": serializer.data, "statusCode": 200})
     except KeyError:
         print("[ERROR] Missing fields")
-        return JsonResponse({"message": "Missing fields", "errorCode": 400})
+        return JsonResponse({"message": "Unauthorized", "errorCode": 401})
     except ExpiredTokenError:
         print("[ERROR] Expired token error")
         return JsonResponse({"message": "Expired token", "errorCode": 401})
     except InvalidTokenError:
         print("[ERROR] Invalid token error")
-        return JsonResponse({"message": "Invalid token", "errorCode": 401})
+        return JsonResponse({"message": "Unauthorized", "errorCode": 401})
     except Exception as ex:
         print("[ERROR] Unknown error:", ex)
         return JsonResponse({"message": "Server error", "errorCode": 400})
