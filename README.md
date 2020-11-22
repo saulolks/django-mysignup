@@ -11,11 +11,14 @@ Repositório para desenvolvimento de APIs REST para cadastro, login e obtenção
 - SQLite
 
 # Acesso às APIs
-O acesso as APIs são feitas pela seguinte URL: https://django-mysignup.herokuapp.com/ e os endpoints são os seguintes:
+O acesso as APIs são feitas pela seguinte URL: https://django-mysignup.herokuapp.com e os endpoints são os seguintes:
 
 - [POST] /signup
+  - Dados deverão ser passados no body.
 - [POST] /signin
+  - Dados deverão ser passados no body.
 - [GET] /me
+  - Dado deverá ser passado no header, no campo Authorization.
 
 # Estrutura dos dados
 O sistema consiste de três tabelas: User, Phone e Token.
